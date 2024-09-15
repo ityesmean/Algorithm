@@ -1,27 +1,26 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
 	
-	static int[][] arr;
+	static boolean[][] visit;
+	
 	static int[] dx = {-1, 1, 0, 0};
 	static int[] dy = {0, 0, -1, 1};
-	static boolean[][] visit;
-	static int N, M, cnt = 0;
 	
-
+	static int N;
+	static int M;
+	
 	public static void main(String[] args) throws IOException {
-		
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
-		arr = new int[N+1][M+1];
+		
+		int[][] arr = new int[N+1][M+1];
 		visit = new boolean[N+1][M+1];
 		
 		for (int i = 1; i <= N; i++) {
@@ -30,43 +29,45 @@ public class Main {
 				arr[i][j] = Integer.parseInt(str[j-1]);
 			}
 		}
-		bfs(1, 1);
-		System.out.println(arr[N][M]);
+		
+		System.out.println(bfs(arr, 1, 1));
 	}
 
-	static class Node {
-		int i, j;
-		
-		public Node(int i, int j) {
-			this.i = i;
-			this.j = j;
-		}
-	}
-	
-	private static void bfs(int i, int j) {
+	private static int bfs(int[][] arr, int x, int y) {
 		Queue<Node> q = new LinkedList<>();
-		q.offer(new Node(i, j));
-		visit[i][j] = true;
+		q.add(new Node(x, y, 1));
+		visit[x][y] = true;
 		
 		while (!q.isEmpty()) {
 			Node tmp = q.poll();
 			
-			for (int k = 0; k < 4; k++) {
-				int x = tmp.i + dx[k];
-				int y = tmp.j + dy[k];
+			if (tmp.i == N && tmp.j == M) {
+				return tmp.count;
+			}
+			
+			for (int i = 0; i < 4; i++) {
+				int nx = tmp.i + dx[i];
+				int ny = tmp.j + dy[i];
 				
-				if (x >= 1 && x <= N && y >= 1 && y <= M && arr[x][y] != 0 &&!visit[x][y]) {
-						
-					q.offer(new Node(x, y));
-					visit[x][y] = true;
-					
-					arr[x][y] = arr[tmp.i][tmp.j] + 1; 
+				if (nx >= 1 && nx <= N && ny >= 1 && ny <= M) {
+					if (visit[nx][ny] == false && arr[nx][ny] == 1) {
+						visit[nx][ny] = true;
+						q.add(new Node(nx, ny, tmp.count+1));
+					}
 				}
 			}
+			
 		}
-		
+		return -1;
 	}
 	
-	
-
+	static class Node {
+		int i, j, count;
+		
+		public Node(int i, int j, int count) {
+			this.i = i;
+			this.j = j;
+			this.count = count;
+		}
+	}
 }
