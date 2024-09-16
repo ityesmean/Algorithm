@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,97 +6,106 @@ import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
-
-	static int N,M;
+	
+	static int N, M;
 	static int[][] arr;
+	static int[][] visit;
 	static int[] dx = {-1, 1, 0, 0};
 	static int[] dy = {0, 0, -1, 1};
-	static int[][] visit;
-	static int answer = 0;
-	static int max = 0;
 	static Queue<Node> q;
 	
-	static class Node {
-		int i, j;
-		
-		public Node(int i, int j) {
-			this.i = i;
-			this.j = j;
-		}
-	}
-
-	
-	public static void main(String[] args) throws IOException {
-		
+	public static void main(String[] args) throws IOException  {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		
-		M = Integer.parseInt(st.nextToken());
 		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
 		
-		arr = new int[N][M];
-		int x = 0, y = 0;
+		arr = new int[M][N];
+		visit = new int[M][N];
 		
-		visit = new int[N][M];
-		
-		q = new LinkedList<>();
-		
-		for (int i = 0; i < N; i++) {
+		for (int i = 0; i < M; i++) {
 			String[] str = br.readLine().split(" ");
-			for (int j = 0; j < M; j++) {
+			for (int j = 0; j < N; j++) {
 				arr[i][j] = Integer.parseInt(str[j]);
+			}
+		}
+		
+		q = new LinkedList<Node>();
+		for (int i = 0; i < M; i++) {
+			for (int j = 0; j < N; j++) {
 				if (arr[i][j] == 1) {
 					q.add(new Node(i, j));
 					visit[i][j] = 1;
 				}
+				
+				else if (arr[i][j] == -1) {
+					visit[i][j] = -1;
+				}
 			}
 		}
 		
-		bfs();
+		bfs(arr);
 		
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < M; j++) {
-				if (arr[i][j] == 0)
-					answer = -1;
-			}
-		}
-		
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < M; j++) {
+		int max = 0;
+		boolean answer = true;
+		for (int i = 0; i < visit.length; i++) {
+			for (int j = 0; j < visit[0].length; j++) {
+				
+				if (visit[i][j] == 0) {
+					answer = false;
+				}
 				max = Math.max(visit[i][j], max);
 			}
 		}
-		if (answer != -1)
-			System.out.println(max-1);
-		else
-			System.out.println(-1);
-	}
-	
-	
-	private static void bfs() {
 		
+		if (answer) {
+			System.out.println(max-1);
+		} else {
+			System.out.println(-1);
+		}
+	}
+
+	private static void bfs(int[][] arr) {
 		
 		while (!q.isEmpty()) {
-			
 			Node tmp = q.poll();
 			
-			
-			for (int k = 0; k < 4; k++) {
-				int x = dx[k] + tmp.i;
-				int y = dy[k] + tmp.j;
-				
-				if (x < 0 || x >= N || y < 0 || y >= M)
-					continue;
-				
-				if (visit[x][y] == 0 && arr[x][y] == 0) {
-					arr[x][y] = 1;
-					visit[x][y] = visit[tmp.i][tmp.j] + 1;
-					q.add(new Node(x, y));
-				}
-				
+			if (arr[tmp.x][tmp.y] == -1) {
+				return;
 			}
 			
+			/*for (int e = 0; e < M; e++) {
+				for (int w = 0; w < N; w++) {
+					System.out.print(visit[e][w] + " ");
+				}
+				System.out.println();
+			}
+
+			System.out.println();*/
 			
+			for (int a = 0; a < 4; a++) {
+				int nx = dx[a] + tmp.x;
+				int ny = dy[a] + tmp.y;
+				
+				if (nx >= 0 && nx < M && ny >= 0 && ny < N) {
+					if (visit[nx][ny] == 0) {
+						visit[nx][ny] = visit[tmp.x][tmp.y] + 1;
+						q.add(new Node(nx, ny));
+					}
+				}
+			}
+		}
+		
+	}
+	
+	static class Node {
+		
+		int x, y;
+		
+		public Node(int x, int y) {
+			this.x = x;
+			this.y = y;
 		}
 	}
 
